@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 /*
 We are starting from a simple identity contract supporting KYC using hashes computed off chain, e.g.
 
@@ -39,12 +40,12 @@ contract MemberIdentityRegistry {
         Registered(hash);
     }
 
-    function verifyCode(bytes32 factor,uint256 key) {
-        uint256 encrypted = code[msg.sender];
+    function verifyCode(bytes32 factor, uint256 key) returns (bool) {
+        uint256 encrypted = code[msg.sender][factor];
         // TODO decode encrypted with key better than product of primes
         bool decoded = encrypted == (key % 1000000) * (key/1000000);
         if ( decoded ) {
-            int256 hash = claimed[msg.sender][factor];
+            uint256 hash = claimed[msg.sender][factor];
             verified[msg.sender][factor] = hash;
             verified[msg.sender]["email"] = hash;
             Verified(hash);
@@ -53,12 +54,12 @@ contract MemberIdentityRegistry {
         return false;
     }
 
-    function setCode(address who, int256 encrypted) {
+    function setCode(address who, bytes32 factor, uint256 encrypted) {
         if(owner != msg.sender) throw;
-        code[who] = encrypted;
+        code[who][factor] = encrypted;
     }
 
-    function verifyIdentity(address who,bytes32 factor, uint256 hash) constant returns(bool) {
+    function verifyIdentity(address who, bytes32 factor, uint256 hash) constant returns(bool) {
         return verified[who][factor] == hash;
     }
     function bringuPort(address uPortId) {   // for future
@@ -72,13 +73,13 @@ contract MemberIdentityRegistry {
         delete verified[who][factor];
     }
     function revokeMyId(bytes32 factor) { 
-       delete verified[factor][msg.sender];
+       delete verified[msg.sender][factor];
     }
-    function revokeAll(bytes32 factor, address who) {
-        if(owner != msg.sender) throw;
-        delete verified[who];
-    }
-    function revokeAllMyId() { 
-       delete verified[msg.sender];
-    }
+    // function revokeAll(bytes32 factor, address who) {
+    //     if(owner != msg.sender) throw;
+    //     verified[who] = new mapping(bytes32 => uint256);
+    // }
+    // function revokeAllMyId() { 
+    //   delete verified[msg.sender];
+    // }
 }
