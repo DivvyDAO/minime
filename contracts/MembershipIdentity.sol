@@ -22,8 +22,8 @@ Use case using hashes:
 // TODO make Owned?
 contract MemberIdentityRegistry {
 
-    address owner = msg.sender;
-    address wallet; // wallet to receive membership fees
+    address public owner = msg.sender;
+    address public wallet; // wallet to receive membership fees
     mapping(address => mapping(bytes32 => uint256)) verified;
     mapping(address => mapping(bytes32 => uint256)) claimed;  
     mapping(address => mapping(bytes32 => uint256)) code;
@@ -32,7 +32,11 @@ contract MemberIdentityRegistry {
     event Registered(uint256 hash);
     event Verified(uint256 hash);
 
-    function claimIdHash(bytes32 factor, uint256 hash) {
+    function setWallet(address addr) {
+        if(owner != msg.sender) throw;
+        wallet = addr;
+    }
+        function claimIFactor(bytes32 factor, uint256 hash) {
         // receive eth coop membership fee
 	    if(msg.value != 1 ether) throw;
 	    if ( ! wallet.send(msg.value) ) throw;
