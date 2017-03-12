@@ -1,14 +1,22 @@
-//import "MiniMeToken.sol";
+//pragma solidity ^0.4.1
+import "MiniMeToken.sol";
 contract Donate {
-    address public owner;
+    address public owner = msg.sender;
     uint public totalCollected; 
     uint price = 1;
-    address token; // minime token contract address
+    MiniMeToken token; // minime token contract address
     
-    function donate() {
+    function setMiniMeToken(address addr) {
+        if (msg.sender != addr ) throw;
+        token = MiniMeToken(addr);
+    }
+    function donate() returns (bool) {
         if (msg.value > 0) {
-            // TODO why is transferFrom not found.
-            token.transferFrom(token, msg.sender, msg.value*price);
+            if (token.transferFrom(owner, msg.sender, msg.value*price)) {
+                owner.send(msg.value);
+                return true;
+            }
         }
+        return false;
     }
 }
