@@ -21,7 +21,12 @@ Use case using hashes:
 // work in progress, starting from a simple solidity example, comment and suggest edits.
 // TODO make Owned?
 contract MemberIdentityRegistry {
-
+    // TODO bring up to standards 
+    // http://solidity.readthedocs.io/en/develop/layout-of-source-files.html
+    // http://solidity.readthedocs.io/en/develop/style-guide.html
+    // http://solidity.readthedocs.io/en/develop/structure-of-a-contract.html
+    // http://solidity.readthedocs.io/en/develop/common-patterns.html
+    // TODO test and debug
     address public owner = msg.sender;
     address public wallet; // wallet to receive membership fees
     mapping(address => mapping(bytes32 => uint256)) verified;
@@ -32,6 +37,7 @@ contract MemberIdentityRegistry {
     event Registered(uint256 hash);
     event Verified(uint256 hash);
 
+    
     function setWallet(address addr) {
         if(owner != msg.sender) throw;
         wallet = addr;
@@ -70,6 +76,13 @@ contract MemberIdentityRegistry {
         // TODO verify address belongs to uPortId
    // corroborate address in uPort ID
         uPortAddress[msg.sender] = uPortId;
+    }
+    
+    function getHashID(address who, bytes32 factor) returns (uint256) {
+        return claimed[who][factor];
+    }
+    function getVerifiedHashID(address who, bytes32 factor) returns (uint256) {
+        return verified[who][factor];
     }
 
     function revoke(bytes32 factor,address who) {
