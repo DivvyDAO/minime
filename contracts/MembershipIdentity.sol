@@ -21,30 +21,36 @@ Use case using hashes:
 // work in progress, starting from a simple solidity example, comment and suggest edits.
 // TODO make Owned?
 contract MemberIdentityRegistry {
-    // TODO bring up to standards 
-    // http://solidity.readthedocs.io/en/develop/layout-of-source-files.html
-    // http://solidity.readthedocs.io/en/develop/style-guide.html
-    // http://solidity.readthedocs.io/en/develop/structure-of-a-contract.html
-    // http://solidity.readthedocs.io/en/develop/common-patterns.html
+    // TODO bring up to standards (amp/rhoc/divvy bounties, work claimed in comments)
+    //   http://solidity.readthedocs.io/en/develop/layout-of-source-files.html
+    //   http://solidity.readthedocs.io/en/develop/style-guide.html
+    //   http://solidity.readthedocs.io/en/develop/structure-of-a-contract.html
+    //   http://solidity.readthedocs.io/en/develop/common-patterns.html
+    //   http://solidity.readthedocs.io/en/develop/security-considerations.html
     // TODO test and debug
     address public owner = msg.sender;
     address public wallet; // wallet to receive membership fees
-    mapping(address => mapping(bytes32 => uint256)) verified;
+    uint256 public price = 1 ether;
+    mapping(address => mapping(bytes32 => uint256)) public verified;
     mapping(address => mapping(bytes32 => uint256)) claimed;  
     mapping(address => mapping(bytes32 => uint256)) code;
     mapping(address => address) uPortAddress; // future use
     
     event Registered(uint256 hash);
     event Verified(uint256 hash);
-
+    
+    function setPrice(uint256 value) {
+        if(owner != msg.sender) throw;
+        price = value;
+    }
     
     function setWallet(address addr) {
         if(owner != msg.sender) throw;
         wallet = addr;
     }
-        function claimIFactor(bytes32 factor, uint256 hash) {
+        function claimIFactor(bytes32 factor, uint256 hash) payable {
         // receive eth coop membership fee
-	    if(msg.value != 1 ether) throw;
+	    // if(msg.value != 1 ether) throw;
 	    if ( ! wallet.send(msg.value) ) throw;
         claimed[msg.sender][factor] = hash;
         Registered(hash);
